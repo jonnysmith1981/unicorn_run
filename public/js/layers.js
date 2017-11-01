@@ -11,34 +11,36 @@ export function createBackgroundLayer(level, sprites) {
     let startIndex, endIndex;
 
     function redraw(drawFrom, drawTo) {
-        if (drawFrom === startIndex && drawTo == endIndex) {
-            return;
-        }
+    //     if (drawFrom === startIndex && drawTo == endIndex) {
+    //         return;
+    //     }
 
         startIndex = drawFrom;
         endIndex = drawTo;
-
-        console.log('redrawing');
 
         for (let x = startIndex; x <= endIndex; ++x) {
             const col = tiles.grid[x];
             if (col) {
                 col.forEach((tile, y) => {
-                    sprites.drawTile(tile.name, context, x - startIndex, y);
+                    if (sprites.animations.has(tile.name)) {
+                        sprites.drawAnimation(tile.name, context, x - startIndex, y, level.totalTime);
+                    } else {
+                        sprites.drawTile(tile.name, context, x - startIndex, y);
+                    }
                 });
-            }
+            } 
         }
     }
 
     return function drawBackgroundLayer(context, camera) {
         const drawWidth = resolver.toIndex(camera.size.x);
         const drawFrom = resolver.toIndex(camera.pos.x);
-        const drawTo  = drawFrom + drawWidth;
-        
+        const drawTo = drawFrom + drawWidth;
+
         redraw(drawFrom, drawTo);
 
-        context.drawImage(buffer, 
-            -camera.pos.x % 16, 
+        context.drawImage(buffer,
+            -camera.pos.x % 16,
             -camera.pos.y);
     }
 }
@@ -70,29 +72,29 @@ export function createCollisionLayer(level) {
 
     const getByIndexOriginal = tileResolver.getByIndex;
     tileResolver.getByIndex = function getByIndexFake(x, y) {
-        resolvedTiles.push({x, y});
+        resolvedTiles.push({ x, y });
         return getByIndexOriginal.call(tileResolver, x, y);
     }
 
     return function drawCollision(context, camera) {
         context.strokeStyle = 'blue';
 
-        resolvedTiles.forEach(({x, y}) => {
+        resolvedTiles.forEach(({ x, y }) => {
             context.beginPath();
             context.rect(
-                x * tileSize - camera.pos.x, 
-                y * tileSize - camera.pos.y, 
+                x * tileSize - camera.pos.x,
+                y * tileSize - camera.pos.y,
                 tileSize, tileSize);
             context.stroke();
         });
-        
+
         context.strokeStyle = 'red';
         level.entities.forEach(entity => {
             context.beginPath();
             context.rect(
-                entity.pos.x - camera.pos.x, 
-                entity.pos.y - camera.pos.y, 
-                entity.size.x, 
+                entity.pos.x - camera.pos.x,
+                entity.pos.y - camera.pos.y,
+                entity.size.x,
                 entity.size.y);
             context.stroke();
         });
@@ -106,9 +108,9 @@ export function createCameraLayer(cameraToDraw) {
         context.strokeStyle = 'purple';
         context.beginPath();
         context.rect(
-            cameraToDraw.pos.x - fromCamera.pos.x, 
-            cameraToDraw.pos.y - fromCamera.pos.y, 
-            cameraToDraw.size.x, 
+            cameraToDraw.pos.x - fromCamera.pos.x,
+            cameraToDraw.pos.y - fromCamera.pos.y,
+            cameraToDraw.size.x,
             cameraToDraw.size.y);
         context.stroke();
     }
