@@ -1,12 +1,13 @@
-import { Sides, Trait } from '../entity.js';
+import { Trait, Sides } from '../entity.js';
 
 export default class Jump extends Trait {
     constructor() {
         super('jump');
+
+        this.ready = 0;
         this.duration = 0.3;
         this.velocity = 200;
         this.engageTime = 0;
-        this.ready = 0;
         this.requestTime = 0;
         this.gracePeriod = 0.1;
         this.speedBoost = 0.3;

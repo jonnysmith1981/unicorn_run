@@ -15,7 +15,7 @@ export class Trait {
     }
 
     update() {
-        console.log('base.update not implemented.')
+        console.warn('Unhanlded update call in Trait');
     }
 }
 

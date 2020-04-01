@@ -1,7 +1,7 @@
-export default class TileResolver{ 
+export default class TileResolver {
     constructor(matrix, tileSize = 16) {
         this.matrix = matrix;
-        this.tileSize = tileSize
+        this.tileSize = tileSize;
     }
 
     toIndex(pos) {
@@ -11,14 +11,11 @@ export default class TileResolver{
     toIndexRange(pos1, pos2) {
         const pMax = Math.ceil(pos2 / this.tileSize) * this.tileSize;
         const range = [];
-
         let pos = pos1;
-
         do {
             range.push(this.toIndex(pos));
             pos += this.tileSize;
-        } while (pos < pMax);
-
+        } while (pos < pMax)
         return range;
     }
 
@@ -41,7 +38,7 @@ export default class TileResolver{
 
     searchByPosition(posX, posY) {
         return this.getByIndex(
-            this.toIndex(posX), 
+            this.toIndex(posX),
             this.toIndex(posY)
         )
     }
@@ -50,7 +47,7 @@ export default class TileResolver{
         const matches = [];
         this.toIndexRange(x1, x2).forEach(indexX => {
             this.toIndexRange(y1, y2).forEach(indexY => {
-                const match = this.getByIndex(indexX, indexY);
+                const match = this.getByIndex(indexX, indexY)
                 if (match) {
                     matches.push(match);
                 }

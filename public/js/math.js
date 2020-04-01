@@ -3,19 +3,18 @@ export class Matrix {
         this.grid = [];
     }
 
-    foreach(callback) {
+    forEach(callback) {
         this.grid.forEach((column, x) => {
             column.forEach((value, y) => {
                 callback(value, x, y);
             })
-        });
+        })
     }
 
     set(x, y, value) {
         if (!this.grid[x]) {
             this.grid[x] = [];
         }
-
         this.grid[x][y] = value;
     }
 
@@ -28,10 +27,12 @@ export class Matrix {
     }
 }
 
+window.Matrix = Matrix;
+
 export class Vec2 {
     constructor(x, y) {
         this.set(x, y);
-    };
+    }
 
     set(x, y) {
         this.x = x;

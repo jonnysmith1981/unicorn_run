@@ -7,7 +7,7 @@ export default class SpriteSheet {
         this.animations = new Map();
     }
 
-    defineAnimation(name, animation) {
+    defineAnim(name, animation) {
         this.animations.set(name, animation);
     }
 
@@ -18,19 +18,24 @@ export default class SpriteSheet {
             buffer.width = width;
             buffer.height = height;
 
-            const context = buffer.getContext('2d')
+            const context = buffer.getContext('2d');
 
             if (flip) {
                 context.scale(-1, 1);
                 context.translate(-width, 0);
             }
 
-            context.drawImage(this.image,
-                x, y,
-                width, height,
-                0, 0,
-                width, height);
-
+            context.drawImage(
+                this.image,
+                x,
+                y,
+                width,
+                height,
+                0,
+                0,
+                width,
+                height
+            );
             return buffer;
         });
         this.tiles.set(name, buffers);
@@ -45,12 +50,12 @@ export default class SpriteSheet {
         context.drawImage(buffer, x, y);
     }
 
-    drawTile(name, context, x, y) {
-        this.draw(name, context, x * this.width, y * this.height);
+    drawAnim(name, context, x, y, distance) {
+        const animation = this.animations.get(name);
+        this.drawTile(animation(distance), context, x, y);
     }
 
-    drawAnimation(name, context, x, y, distance) {
-        const animation = this.animations.get(name);
-        this.drawTile(animation(distance), context, x, y); 
+    drawTile(name, context, x, y) {
+        this.draw(name, context, x * this.width, y * this.height);
     }
 }
