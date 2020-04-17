@@ -1,20 +1,36 @@
-import Timer from './timer.js';
-import Camera from './camera.js';
-import { loadLevel } from './loaders/level.js';
-import { createMario } from './entities.js';
+import Camera from './Camera.js';
+import Timer from './Timer.js';
+import { createLevelLoader } from './loaders/level.js';
+import { loadEntities } from './entities.js';
 import { setupKeyboard } from './input.js';
+import { createCollisionLayer } from './layers.js';
+import Entity from './Entity.js';
+import PlayerController from './traits/PlayerController.js';
 
-const canvas = document.getElementById('screen');
-const context = canvas.getContext('2d');
+function createPlayerEnvironment(playerEntity) {
+    const playerEnv = new Entity();
+    const playerControl = new PlayerController();
+    playerControl.checkpoint.set(64, 64);
+    playerControl.setPlayer(playerEntity)
+    playerEnv.addTrait(playerControl);
+    return playerEnv;
+}
 
-Promise.all([
-    createMario(),
-    loadLevel('1-1')
-]).then(([mario, level]) => {
+async function main(canvas) {
+    const context = canvas.getContext('2d');
+    const entityFactory = await loadEntities();
+    const loadLevel = await createLevelLoader(entityFactory);
+    const level = await loadLevel('1-1');
+
     const camera = new Camera();
-    mario.pos.set(64, 64);
 
+    const mario = entityFactory.mario();
     level.entities.add(mario);
+
+    const playerEnv = createPlayerEnvironment(mario);
+    level.entities.add(playerEnv);
+
+    level.comp.layers.push(createCollisionLayer(level));
 
     const input = setupKeyboard(mario);
     input.listenTo(window);
@@ -22,13 +38,11 @@ Promise.all([
     const timer = new Timer(1 / 60);
     timer.update = function update(deltaTime) {
         level.update(deltaTime);
-
-        if (mario.pos.x > 100) {
-            camera.pos.x = mario.pos.x - 100;
-        }
-
+        camera.pos.x = Math.max(0, mario.pos.x - 100);
         level.comp.draw(context, camera);
     }
     timer.start();
-});
+}
 
+const canvas = document.getElementById('screen');
+main(canvas);

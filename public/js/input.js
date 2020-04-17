@@ -1,4 +1,4 @@
-import Keyboard from './keyboardState.js';
+import Keyboard from './KeyboardState.js';
 
 export function setupKeyboard(mario) {
 
@@ -10,7 +10,6 @@ export function setupKeyboard(mario) {
         } else {
             mario.jump.cancel();
         }
-        console.log(keyState);
     });
 
     input.addMapping('KeyO', keyState => {

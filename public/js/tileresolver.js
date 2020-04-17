@@ -15,7 +15,7 @@ export default class TileResolver {
         do {
             range.push(this.toIndex(pos));
             pos += this.tileSize;
-        } while (pos < pMax)
+        } while (pos < pMax);
         return range;
     }
 
@@ -31,23 +31,22 @@ export default class TileResolver {
                 x1,
                 x2,
                 y1,
-                y2
-            }
+                y2,
+            };
         }
     }
 
     searchByPosition(posX, posY) {
         return this.getByIndex(
             this.toIndex(posX),
-            this.toIndex(posY)
-        )
+            this.toIndex(posY));
     }
 
     searchByRange(x1, x2, y1, y2) {
         const matches = [];
         this.toIndexRange(x1, x2).forEach(indexX => {
             this.toIndexRange(y1, y2).forEach(indexY => {
-                const match = this.getByIndex(indexX, indexY)
+                const match = this.getByIndex(indexX, indexY);
                 if (match) {
                     matches.push(match);
                 }

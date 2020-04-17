@@ -1,29 +1,50 @@
 import { Vec2 } from './math.js';
+import BoundingBox from './BoundingBox.js';
 
 export const Sides = {
     TOP: Symbol('top'),
-    BOTTOM: Symbol('bottom')
-}
+    BOTTOM: Symbol('bottom'),
+    LEFT: Symbol('left'),
+    RIGHT: Symbol('right'),
+};
 
 export class Trait {
     constructor(name) {
         this.NAME = name;
+        this.tasks = [];
     }
 
     obstruct() {
 
     }
 
+    collides(us, them) {
+
+    }
+
     update() {
-        console.warn('Unhanlded update call in Trait');
+
+    }
+
+    queue(task) {
+        this.tasks.push(task);
+    }
+
+    finalize() {
+        this.tasks.forEach(task => task());
+        this.tasks.length = 0;
     }
 }
 
 export default class Entity {
     constructor() {
+        this.canCollide = true;
         this.pos = new Vec2(0, 0);
         this.vel = new Vec2(0, 0);
         this.size = new Vec2(0, 0);
+        this.offset = new Vec2(0, 0);
+        this.bounds = new BoundingBox(this.pos, this.size, this.offset);
+        this.lifetime = 0;
 
         this.traits = [];
     }
@@ -33,15 +54,33 @@ export default class Entity {
         this[trait.NAME] = trait;
     }
 
-    obstruct(side) {
+    collides(candidate) {
         this.traits.forEach(trait => {
-            trait.obstruct(this, side);
+            trait.collides(this, candidate);
         });
     }
 
-    update(deltaTime) {
+    obstruct(side, match) {
         this.traits.forEach(trait => {
-            trait.update(this, deltaTime);
+            trait.obstruct(this, side, match);
         });
+    }
+
+    update(deltaTime, level) {
+        this.traits.forEach(trait => {
+            trait.update(this, deltaTime, level);
+        });
+
+        this.lifetime += deltaTime;
+    }
+
+    draw() {
+
+    }
+
+    finalize() {
+        this.traits.forEach(trait => {
+            trait.finalize();
+        })
     }
 }

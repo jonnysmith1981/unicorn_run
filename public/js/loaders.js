@@ -1,4 +1,4 @@
-import SpriteSheet from './spritesheet.js';
+import SpriteSheet from './SpriteSheet.js';
 import { createAnim } from './animations.js';
 
 export function loadImage(url) {
