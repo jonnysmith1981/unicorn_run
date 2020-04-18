@@ -34,16 +34,20 @@ export default class Jump extends Trait {
         }
     }
 
-    update(entity, deltaTime) {
+    update(entity, { deltaTime }, level) {
         if (this.requestTime > 0) {
             if (this.ready > 0) {
+                entity.sounds.add('jump');
                 this.engageTime = this.duration;
                 this.requestTime = 0;
             }
             this.requestTime -= deltaTime;
         }
         if (this.engageTime > 0) {
-            entity.vel.y = -(this.velocity + Math.abs(entity.vel.x) * this.speedBoost);
+            entity.vel.y = -(
+                this.velocity +
+                Math.abs(entity.vel.x) * this.speedBoost
+            );
             this.engageTime -= deltaTime;
         }
         this.ready--;

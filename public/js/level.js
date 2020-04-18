@@ -8,16 +8,12 @@ export default class Level {
         this.comp = new Compositor();
         this.entities = new Set();
         this.entityCollider = new EntityCollider(this.entities);
-        this.tileCollider = null;
+        this.tileCollider = new TileCollider();
     }
 
-    setCollisionGrid(matrix) {
-        this.tileCollider = new TileCollider(matrix);
-    }
-
-    update(deltaTime) {
+    update(gameContext) {
         this.entities.forEach(entity => {
-            entity.update(deltaTime, this);
+            entity.update(gameContext, this);
         });
 
         this.entities.forEach(entity => {
@@ -28,6 +24,6 @@ export default class Level {
             entity.finalize();
         });
 
-        this.totalTime += deltaTime;
+        this.totalTime += gameContext.deltaTime;
     }
 }

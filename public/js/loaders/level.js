@@ -1,21 +1,19 @@
 import { Matrix } from '../math.js';
 import Level from '../Level.js';
-import { createBackgroundLayer, createSpriteLayer } from '../layers.js';
+import { createSpriteLayer } from '../layers/sprites.js';
+import { createBackgroundLayer } from '../layers/background.js';
 import { loadJSON, loadSpriteSheet } from '../loaders.js';
-
-function setupCollision(levelSpec, level) {
-    const mergedTiles = levelSpec.layers.reduce((mergedTiles, layerSpec) => {
-        return mergedTiles.concat(layerSpec.tiles);
-    }, []);
-    const collisionGrid = createCollisionGrid(mergedTiles, levelSpec.patterns);
-    level.setCollisionGrid(collisionGrid);
-}
 
 function setupBackgrounds(levelSpec, level, backgroundSprites) {
     levelSpec.layers.forEach(layer => {
-        const backgroundGrid = createBackgroundGrid(layer.tiles, levelSpec.patterns);
-        const backgroundLayer = createBackgroundLayer(level, backgroundGrid, backgroundSprites);
+        const grid = createGrid(layer.tiles, levelSpec.patterns);
+        const backgroundLayer = createBackgroundLayer(
+            level,
+            grid,
+            backgroundSprites
+        );
         level.comp.layers.push(backgroundLayer);
+        level.tileCollider.addGrid(grid);
     });
 }
 
@@ -33,42 +31,30 @@ function setupEntities(levelSpec, level, entityFactory) {
 export function createLevelLoader(entityFactory) {
     return function loadLevel(name) {
         return loadJSON(`/levels/${name}.json`)
-            .then(levelSpec => Promise.all([
-                levelSpec,
-                loadSpriteSheet(levelSpec.spriteSheet),
-            ]))
+            .then(levelSpec =>
+                Promise.all([levelSpec, loadSpriteSheet(levelSpec.spriteSheet)])
+            )
             .then(([levelSpec, backgroundSprites]) => {
                 const level = new Level();
 
-                setupCollision(levelSpec, level);
                 setupBackgrounds(levelSpec, level, backgroundSprites);
                 setupEntities(levelSpec, level, entityFactory);
 
                 return level;
             });
-    }
+    };
 }
 
-function createCollisionGrid(tiles, patterns) {
+function createGrid(tiles, patterns) {
     const grid = new Matrix();
 
-    for (const { tile, x, y } of expandTiles(tiles, patterns)) {
-        grid.set(x, y, { type: tile.type });
+    for (const { tile, x, y }
+        of expandTiles(tiles, patterns)) {
+        grid.set(x, y, tile);
     }
 
     return grid;
 }
-
-function createBackgroundGrid(tiles, patterns) {
-    const grid = new Matrix();
-
-    for (const { tile, x, y } of expandTiles(tiles, patterns)) {
-        grid.set(x, y, { name: tile.name });
-    }
-
-    return grid;
-}
-
 
 function* expandSpan(xStart, xLen, yStart, yLen) {
     const xEnd = xStart + xLen;
@@ -84,11 +70,9 @@ function expandRange(range) {
     if (range.length === 4) {
         const [xStart, xLen, yStart, yLen] = range;
         return expandSpan(xStart, xLen, yStart, yLen);
-
     } else if (range.length === 3) {
         const [xStart, xLen, yStart] = range;
         return expandSpan(xStart, xLen, yStart, 1);
-
     } else if (range.length === 2) {
         const [xStart, yStart] = range;
         return expandSpan(xStart, 1, yStart, 1);
@@ -97,14 +81,15 @@ function expandRange(range) {
 
 function* expandRanges(ranges) {
     for (const range of ranges) {
-        yield* expandRange(range)
+        yield* expandRange(range);
     }
 }
 
 function* expandTiles(tiles, patterns) {
     function* walkTiles(tiles, offsetX, offsetY) {
         for (const tile of tiles) {
-            for (const { x, y } of expandRanges(tile.ranges)) {
+            for (const { x, y }
+                of expandRanges(tile.ranges)) {
                 const derivedX = x + offsetX;
                 const derivedY = y + offsetY;
 
@@ -115,7 +100,7 @@ function* expandTiles(tiles, patterns) {
                     yield {
                         tile,
                         x: derivedX,
-                        y: derivedY,
+                        y: derivedY
                     };
                 }
             }

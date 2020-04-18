@@ -28,18 +28,18 @@ export default class TileResolver {
             const y2 = y1 + this.tileSize;
             return {
                 tile,
+                indexX,
+                indexY,
                 x1,
                 x2,
                 y1,
-                y2,
+                y2
             };
         }
     }
 
     searchByPosition(posX, posY) {
-        return this.getByIndex(
-            this.toIndex(posX),
-            this.toIndex(posY));
+        return this.getByIndex(this.toIndex(posX), this.toIndex(posY));
     }
 
     searchByRange(x1, x2, y1, y2) {

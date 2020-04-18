@@ -6,8 +6,7 @@ import { loadSpriteSheet } from '../loaders.js';
 import Solid from '../traits/Solid.js';
 
 export function loadKoopa() {
-    return loadSpriteSheet('koopa')
-        .then(createKoopaFactory);
+    return loadSpriteSheet('koopa').then(createKoopaFactory);
 }
 
 const STATE_WALKING = Symbol('walking');
@@ -57,7 +56,7 @@ class Behaviour extends Trait {
             this.hide(us);
         } else if (this.state === STATE_HIDING) {
             us.killable.kill();
-            us.vel.set(100, 200);
+            us.vel.set(100, -200);
             us.solid.obstructs = false;
         } else if (this.state === STATE_PANIC) {
             this.hide(us);
@@ -86,7 +85,7 @@ class Behaviour extends Trait {
         this.state = STATE_PANIC;
     }
 
-    update(us, deltaTime) {
+    update(us, { deltaTime }) {
         if (this.state === STATE_HIDING) {
             this.hideTime += deltaTime;
             if (this.hideTime > this.hideDuration) {

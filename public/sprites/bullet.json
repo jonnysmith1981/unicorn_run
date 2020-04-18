@@ -1,0 +1,12 @@
+{
+    "imageUrl": "/img/characters.gif",
+    "frames": [{
+        "name": "bullet",
+        "rect": [
+            267,
+            334,
+            16,
+            14
+        ]
+    }]
+}

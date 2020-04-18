@@ -12,8 +12,9 @@ export default class Go extends Trait {
         this.heading = 1;
     }
 
-    update(entity, deltaTime) {
+    update(entity, { deltaTime }) {
         const absX = Math.abs(entity.vel.x);
+
         if (this.dir !== 0) {
             entity.vel.x += this.acceleration * deltaTime * this.dir;
 
@@ -24,7 +25,6 @@ export default class Go extends Trait {
             } else {
                 this.heading = this.dir;
             }
-
         } else if (entity.vel.x !== 0) {
             const decel = Math.min(absX, this.deceleration * deltaTime);
             entity.vel.x += entity.vel.x > 0 ? -decel : decel;

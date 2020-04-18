@@ -7,8 +7,8 @@ export class Matrix {
         this.grid.forEach((column, x) => {
             column.forEach((value, y) => {
                 callback(value, x, y);
-            })
-        })
+            });
+        });
     }
 
     set(x, y, value) {
@@ -25,9 +25,14 @@ export class Matrix {
         }
         return undefined;
     }
-}
 
-window.Matrix = Matrix;
+    delete(x, y) {
+        const col = this.grid[x];
+        if (col) {
+            delete col[y];
+        }
+    }
+}
 
 export class Vec2 {
     constructor(x, y) {
@@ -37,5 +42,10 @@ export class Vec2 {
     set(x, y) {
         this.x = x;
         this.y = y;
+    }
+
+    copy(vec2) {
+        this.x = vec2.x;
+        this.y = vec2.y;
     }
 }
